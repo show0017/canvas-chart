@@ -7,12 +7,20 @@ function init(){
 }
 
 function loadJsonData (path){
-    var jsonScriptTag = document.createElement("script");
-    jsonScriptTag.addEventListener("load", onLoadJson );
-    document.querySelector("body").appendChild(jsonScriptTag);
-    jsonScriptTag.setAttribute("src",path);
+//    var jsonScriptTag = document.createElement("script");
+//    jsonScriptTag.addEventListener("load", onLoadJson );
+//    document.querySelector("body").appendChild(jsonScriptTag);
+//    jsonScriptTag.setAttribute("src",path);
+
+    var xhr = $.ajax({
+        url: path,
+        datatype: "json",
+        type:"GET"
+    }).
+    done(onLoadJson).
+    fail(function(){console.error("***** Failed to load json data from server *****"+xhr.status); });
 }
 
-function onLoadJson(){
-    console.log(myData);
+function onLoadJson(data){
+    console.log(data);
 }
