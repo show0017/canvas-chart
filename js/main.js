@@ -102,4 +102,18 @@ function drawPieChart(values){
         //update the currentAngle
         currentAngle = endAngle;
     }
+
+    drawInnerCircle(cx, cy,context, radius);
+}
+
+function drawInnerCircle(cx, cy,context, radius){
+    context.beginPath();
+    context.arc(cx, cy, 0.5*radius, 0, 2 * Math.PI, false);
+    context.fillStyle = 'white';
+    context.fill();
+
+    context.textAlign = 'center';
+    context.fillStyle = "black";
+    context.fillText("Cheese", cx,cy);
+
 }
