@@ -128,9 +128,14 @@ function drawTempChart(values){
     var canvas = document.getElementById("temp-chart");
     var context = canvas.getContext("2d");
     setDefaultStyles(context);
-    var radius = 30;
-    var cx = radius + 5;
-    var cy = radius + 5;
+    var radius = 30; //25,30
+    var offset = 5; //15,5
+    var cx = radius + offset;
+    var cy = radius + offset;
+
+    /*draw vertical/horizontal bars for the smaller circles.*/
+    drawBars(canvas,context, cx, cy ,offset);
+
     var total = getTotalValues(values);
     for(var i=0; i<values.length; i++){
         var pct = values[i].value/total;
@@ -144,8 +149,45 @@ function drawTempChart(values){
         context.fill();
 
         /*increment cy to draw next circle to the bottom of the current one. */
-        cy += (2*radius + 5);
+        cy += (2*radius + offset);
 
     }
 
 }
+
+function drawBars(canvas,context, cx , cy, verticalOffset){
+    var rectWidth = 4;
+    var rectHeight = canvas.height - 2*verticalOffset;
+    var cxRect = 2*cx;
+    /*Draw first vertical bar.*/
+    drawRect(context, cxRect, verticalOffset, rectWidth, rectHeight);
+
+
+    var radiusInnerCircle = 15;
+    var numberOfInnerCircles = 10;
+    /*Draw second vertical bar.*/
+    cxRect += (numberOfInnerCircles* (2*radiusInnerCircle))
+    drawRect(context, cxRect, verticalOffset, rectWidth, rectHeight);
+
+    /*Draw horizontal bar*/
+    cxRect = 2*cx+rectWidth;
+    rectHeight = 4;
+    rectWidth = numberOfInnerCircles* (2*radiusInnerCircle);
+    drawRect(context,cxRect,cy,rectWidth,rectHeight );
+
+}
+
+function drawRect(context, cx, cy, width, height){
+    context.moveTo(cx, cy);
+    context.beginPath();
+    context.fillStyle = "grey";
+    context.rect(cx, cy, width, height);
+    context.fill();
+}
+
+/* 400px width = 60px(2R of circle indicator) +
+                 2*5px(right/left offsets around circle indicator) +
+                 2*4px (width of vertical rectangle bars)+
+                 2*2px (right offset of first vertical bar + left offset of second vertical bar)
+                 10*30px (2R of inner-circles multiplied by 10 times)
+                 = 378px*/
