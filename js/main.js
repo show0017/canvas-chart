@@ -25,6 +25,7 @@ function onLoadJson(data){
     console.log(data);
 
     drawPieChart(data["segments"]);
+    drawTempChart(data["segments"]);
 }
 
 function setDefaultStyles(context){
@@ -44,7 +45,7 @@ function getTotalValues(values){
 
     return sum;
 }
-
+/* Pie-Chart Functions*/
 function drawPieChart(values){
     var canvas = document.getElementById("pie-chart");
     var context = canvas.getContext("2d");
@@ -119,5 +120,32 @@ function drawInnerCircle(cx, cy,context, radius){
 
     //put the canvas back to the original position
     context.restore();
+
+}
+
+/* Temp-Chart Functions */
+function drawTempChart(values){
+    var canvas = document.getElementById("temp-chart");
+    var context = canvas.getContext("2d");
+    setDefaultStyles(context);
+    var radius = 30;
+    var cx = radius + 5;
+    var cy = radius + 5;
+    var total = getTotalValues(values);
+    for(var i=0; i<values.length; i++){
+        var pct = values[i].value/total;
+        var colour = values[i].color;
+
+        /* Draw indicator circle for each cheese type.*/
+        context.moveTo(cx, cy);
+        context.beginPath();
+        context.fillStyle = colour;
+        context.arc(cx, cy, radius, 0, 2*Math.PI, false);
+        context.fill();
+
+        /*increment cy to draw next circle to the bottom of the current one. */
+        cy += (2*radius + 5);
+
+    }
 
 }
