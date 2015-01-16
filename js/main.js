@@ -97,6 +97,7 @@ function drawPieChart(values){
         var dy = Math.sin(midAngle) * (radius + 30);
         context.lineTo(dx, dy);
         context.stroke();
+        context.fillText(values[i].label, dx , dy);
         //put the canvas back to the original position
         context.restore();
         //update the currentAngle
@@ -115,5 +116,8 @@ function drawInnerCircle(cx, cy,context, radius){
     context.textAlign = 'center';
     context.fillStyle = "black";
     context.fillText("Cheese", cx,cy);
+
+    //put the canvas back to the original position
+    context.restore();
 
 }
