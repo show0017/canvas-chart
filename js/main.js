@@ -36,6 +36,15 @@ function setDefaultStyles(context){
   context.textAlign = "left";
 }
 
+function getTotalValues(values){
+    var sum = 0;
+    for(var i=0; i<values.length; i++){
+        sum += values[i].value;
+    }
+
+    return sum;
+}
+
 function drawPieChart(values){
     var canvas = document.getElementById("pie-chart");
     var context = canvas.getContext("2d");
@@ -46,11 +55,7 @@ function drawPieChart(values){
     var radius = 100;
     var currentAngle = 0;
 
-    var total = 0;
-    for(var i=0; i<values.length; i++){
-        total += values[i].value;
-    }
-
+    var total = getTotalValues(values);
     //the difference for each wedge in the pie is arc along the circumference
     //we use the percentage to determine what percentage of the whole circle
     //the full circle is 2 * Math.PI radians long.
