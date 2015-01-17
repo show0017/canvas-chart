@@ -133,6 +133,7 @@ var TempChart = (function () {
     var radiusInnerCircle = 10;
     var numberOfInnerCircles = 10;
     var innerCircleOffset = 4;
+    var verticalBarWidth = 4;
 
     /*set default styles for canvas*/
     var setDefaultStyles = function () {
@@ -141,6 +142,15 @@ var TempChart = (function () {
       context.font = "bold 16pt Arial";
       context.fillStyle = "#900";	//colour of the text
       context.textAlign = "left";
+    };
+
+    var getTotalValues = function (values){
+        var sum = 0;
+        for(var i=0; i<values.length; i++){
+            sum += values[i].value;
+        }
+
+        return sum;
     };
 
     var drawRect = function(cx, cy, width, height){
@@ -161,11 +171,11 @@ var TempChart = (function () {
         context.fill();
     };
 
-    var drawSmallerCircles = function(cx,cy){
-        for(var i=0; i< numberOfInnerCircles; i++){
+    var drawSmallerCircles = function(cx,cy, numOfCircles,fillColor){
+        for(var i=0; i< numOfCircles; i++){
             context.moveTo(cx, cy);
             context.beginPath();
-            context.fillStyle = "#D0D0D0";
+            context.fillStyle = fillColor;
             context.arc(cx, cy, radiusInnerCircle, 0, 2*Math.PI, false);
             context.fill();
             cx += 2*radiusInnerCircle + innerCircleOffset;
@@ -175,7 +185,6 @@ var TempChart = (function () {
     var drawGrid = function (values){
 
         /*Draw first vertical bar.*/
-        var verticalBarWidth = 4;
         var verticalBarHeight = canvas.height - 2*offset;
         var cx = 2*(indicatorCircleRadius + offset);
         var cy = offset;
@@ -190,7 +199,10 @@ var TempChart = (function () {
         for (var i=0; i<values.length; i++){
             drawRect(cx,cy,horizontalBarWidth,horizontalBarHeight );
             drawIndicatorCircle(cy,values[i].color);
-            drawSmallerCircles(cx+radiusInnerCircle+innerCircleOffset,cy);
+            drawSmallerCircles(cx+radiusInnerCircle+innerCircleOffset,
+                               cy,
+                               numberOfInnerCircles,
+                               "#D0D0D0");
             cy += (2*indicatorCircleRadius + offset);
         }
 
@@ -200,13 +212,58 @@ var TempChart = (function () {
         drawRect(cx, cy, verticalBarWidth, verticalBarHeight);
     };
 
-    var draw = function (values) {
-      canvas = document.getElementById("temp-chart");
-      context = canvas.getContext("2d");
-      setDefaultStyles();
+    var drawFractionalCircle = function (cx,cy,fraction,fillColor){
+        context.moveTo(cx,cy);
+        context.beginPath();
+        context.fillStyle = fillColor;
+        context.arc(cx, cy, radiusInnerCircle, 0, 2*Math.PI*fraction, false);
+        context.lineTo(cx, cy);
+        context.fill();
+    };
 
-      /*draw vertical/horizontal bars as well as the inner circles for basic chart grid.*/
-      drawGrid(values);
+    var highlightCircles = function(numOfCompleteCircles, fraction, cy, fillColor){
+
+        /*start of cx is fixed for all inner circles.*/
+        var cx = 2*(indicatorCircleRadius + offset) +
+            verticalBarWidth +innerCircleOffset + radiusInnerCircle;
+
+        /* highlight completed circles.*/
+        drawSmallerCircles(cx,cy,numOfCompleteCircles,fillColor);
+
+        /* draw fraction circle */
+        cx += (numOfCompleteCircles*(2*radiusInnerCircle + innerCircleOffset));
+        drawFractionalCircle(cx,cy,fraction,fillColor);
+
+    };
+
+    var drawPercent = function(values){
+        var total = getTotalValues(values);
+        var cy = indicatorCircleRadius + offset;
+        for(var i=0; i<values.length ; i++){
+            var pct = values[i].value/total;
+            var color = values[i].color;
+            var totalNumOfCircles = pct * numberOfInnerCircles;
+            var numOfCompleteCircles = Math.floor(totalNumOfCircles);
+            var fractionOfCircle     = totalNumOfCircles - numOfCompleteCircles;
+            console.debug("value:"+values[i].value+"\n\tpct:"+pct+"\n\ttotalNumOfCircles:"+
+                          totalNumOfCircles+"\n\tnumOfCompleteCircles:"+numOfCompleteCircles+
+                          "\n\tfractionOfCircle:"+fractionOfCircle);
+            highlightCircles(numOfCompleteCircles, fractionOfCircle, cy, color);
+            cy += (2*indicatorCircleRadius + offset);
+        }
+
+    };
+
+    var draw = function (values) {
+        canvas = document.getElementById("temp-chart");
+        context = canvas.getContext("2d");
+        setDefaultStyles();
+
+        /*draw vertical/horizontal bars as well as the inner circles for basic chart grid.*/
+        drawGrid(values);
+
+        /*apply percentage of values on the chart*/
+        drawPercent(values);
     };
 
   return {
