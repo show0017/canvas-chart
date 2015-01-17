@@ -130,8 +130,9 @@ var TempChart = (function () {
     var offset = 5; //15,5
     var canvas;
     var context;
-    var radiusInnerCircle = 15;
+    var radiusInnerCircle = 10;
     var numberOfInnerCircles = 10;
+    var innerCircleOffset = 4;
 
     var setDefaultStyles = function () {
       //set default styles for canvas
@@ -145,7 +146,7 @@ var TempChart = (function () {
     var drawRect = function(cx, cy, width, height){
         context.moveTo(cx, cy);
         context.beginPath();
-        context.fillStyle = "grey";
+        context.fillStyle = "#808080";
         context.rect(cx, cy, width, height);
         context.fill();
     };
@@ -158,6 +159,17 @@ var TempChart = (function () {
         context.fillStyle = color;
         context.arc(cx, cy, indicatorCircleRadius, 0, 2*Math.PI, false);
         context.fill();
+    };
+
+    var drawSmallerCircles = function(cx,cy){
+        for(var i=0; i< numberOfInnerCircles; i++){
+            context.moveTo(cx, cy);
+            context.beginPath();
+            context.fillStyle = "#D0D0D0";
+            context.arc(cx, cy, radiusInnerCircle, 0, 2*Math.PI, false);
+            context.fill();
+            cx += 2*radiusInnerCircle + innerCircleOffset;
+        }
     };
 
     var drawBars = function (values){
@@ -173,16 +185,18 @@ var TempChart = (function () {
         cx += verticalBarWidth;
         cy += indicatorCircleRadius;
         var horizontalBarHeight = 1;
-        var horizontalBarWidth = numberOfInnerCircles* (2*radiusInnerCircle);
+        var horizontalBarWidth = numberOfInnerCircles*2*radiusInnerCircle +
+            (numberOfInnerCircles+1)*innerCircleOffset;
         for (var i=0; i<values.length; i++){
             drawRect(cx,cy,horizontalBarWidth,horizontalBarHeight );
             drawIndicatorCircle(cy,values[i].color);
+            drawSmallerCircles(cx+radiusInnerCircle+innerCircleOffset,cy);
             cy += (2*indicatorCircleRadius + offset);
         }
 
 
         /*Draw second vertical bar.*/
-        cx += (numberOfInnerCircles* (2*radiusInnerCircle));
+        cx += horizontalBarWidth;
         cy = offset;
         drawRect(cx, cy, verticalBarWidth, verticalBarHeight);
 
