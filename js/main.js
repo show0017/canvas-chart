@@ -25,7 +25,7 @@ function onLoadJson(data){
     console.log(data);
 
     PieChart.draw(data["segments"]);
-    TempChart.draw();
+    TempChart.draw(data["segments"]);
 }
 
 
@@ -150,28 +150,52 @@ var TempChart = (function () {
         context.fill();
     };
 
-    var drawBars = function (){
-        var barWidth = 4;
-        var barHeight = canvas.height - 2*offset;
+    var drawIndicatorCircle = function (cy,color){
+        /* Draw indicator circle for each cheese type.*/
+        var cx = indicatorCircleRadius + offset;
+        context.moveTo(cx, cy);
+        context.beginPath();
+        context.fillStyle = color;
+        context.arc(cx, cy, indicatorCircleRadius, 0, 2*Math.PI, false);
+        context.fill();
+    };
+
+    var drawBars = function (values){
+        var verticalBarWidth = 4;
+        var verticalBarHeight = canvas.height - 2*offset;
         var cx = 2*(indicatorCircleRadius + offset);
         var cy = offset;
 
         /*Draw first vertical bar.*/
-        drawRect(cx, cy, barWidth,barHeight);
+        drawRect(cx, cy, verticalBarWidth, verticalBarHeight);
+
+        /*draw horizontal bars.*/
+        cx += verticalBarWidth;
+        cy += indicatorCircleRadius;
+        var horizontalBarHeight = 1;
+        var horizontalBarWidth = numberOfInnerCircles* (2*radiusInnerCircle);
+        for (var i=0; i<values.length; i++){
+            drawRect(cx,cy,horizontalBarWidth,horizontalBarHeight );
+            drawIndicatorCircle(cy,values[i].color);
+            cy += (2*indicatorCircleRadius + offset);
+        }
+
 
         /*Draw second vertical bar.*/
-        cx += (numberOfInnerCircles* (2*radiusInnerCircle))
-        drawRect(cx, cy, barWidth, barHeight);
+        cx += (numberOfInnerCircles* (2*radiusInnerCircle));
+        cy = offset;
+        drawRect(cx, cy, verticalBarWidth, verticalBarHeight);
+
 
     };
 
-    var draw = function () {
+    var draw = function (values) {
       canvas = document.getElementById("temp-chart");
       context = canvas.getContext("2d");
       setDefaultStyles();
 
       /*draw vertical/horizontal bars for the smaller circles.*/
-      drawBars();
+      drawBars(values);
     };
 
   return {
