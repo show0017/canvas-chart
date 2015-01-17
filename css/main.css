@@ -1,4 +1,32 @@
+.wrapper{
+    min-width: 400px;
+    max-width: 960px;
+    margin: 0 auto;
+    background-color: beige;
+}
+
+.col{
+    display: block;
+    max-width: 400px;
+    margin: 0 auto;
+    padding-bottom: 2%;
+}
+
 #pie-chart,
 #temp-chart{
-    outline: 1px solid red;
+    outline: 2px dotted black;
+}
+
+@media screen and (min-width: 970px){
+    .col{
+        display: inline-block;
+        margin: 0 2.5%;
+
+    }
+    .col:first-child{
+        margin-left: 5%;
+    }
+    .col:last-child{
+        margin-right: 5%;
+    }
 }
