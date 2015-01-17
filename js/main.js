@@ -134,8 +134,8 @@ var TempChart = (function () {
     var numberOfInnerCircles = 10;
     var innerCircleOffset = 4;
 
+    /*set default styles for canvas*/
     var setDefaultStyles = function () {
-      //set default styles for canvas
       context.strokeStyle = "#333";	//colour of the lines
       context.lineWidth = 3;
       context.font = "bold 16pt Arial";
@@ -151,8 +151,8 @@ var TempChart = (function () {
         context.fill();
     };
 
+    /* Draw indicator circle for each cheese type.*/
     var drawIndicatorCircle = function (cy,color){
-        /* Draw indicator circle for each cheese type.*/
         var cx = indicatorCircleRadius + offset;
         context.moveTo(cx, cy);
         context.beginPath();
@@ -172,16 +172,16 @@ var TempChart = (function () {
         }
     };
 
-    var drawBars = function (values){
+    var drawGrid = function (values){
+
+        /*Draw first vertical bar.*/
         var verticalBarWidth = 4;
         var verticalBarHeight = canvas.height - 2*offset;
         var cx = 2*(indicatorCircleRadius + offset);
         var cy = offset;
-
-        /*Draw first vertical bar.*/
         drawRect(cx, cy, verticalBarWidth, verticalBarHeight);
 
-        /*draw horizontal bars.*/
+        /*draw horizontal bars as well as inner circles of the base grid.*/
         cx += verticalBarWidth;
         cy += indicatorCircleRadius;
         var horizontalBarHeight = 1;
@@ -194,13 +194,10 @@ var TempChart = (function () {
             cy += (2*indicatorCircleRadius + offset);
         }
 
-
         /*Draw second vertical bar.*/
         cx += horizontalBarWidth;
         cy = offset;
         drawRect(cx, cy, verticalBarWidth, verticalBarHeight);
-
-
     };
 
     var draw = function (values) {
@@ -208,8 +205,8 @@ var TempChart = (function () {
       context = canvas.getContext("2d");
       setDefaultStyles();
 
-      /*draw vertical/horizontal bars for the smaller circles.*/
-      drawBars(values);
+      /*draw vertical/horizontal bars as well as the inner circles for basic chart grid.*/
+      drawGrid(values);
     };
 
   return {
