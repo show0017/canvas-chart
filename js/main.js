@@ -187,8 +187,9 @@ var PieChart = (function () {
 
 /* Temp-Chart Functions */
 var TempChart = (function () {
-    var indicatorCircleRadius = 30; //25,30
-    var horizontalOffset = 25;
+    var rectWidth = 90;
+    var rectHeight = 30;
+    var horizontalOffset = 20;
     var verticalOffset = 5;
     var canvas;
     var context;
@@ -224,17 +225,18 @@ var TempChart = (function () {
     };
 
     /* Draw indicator circle for each cheese type.*/
-    var drawIndicatorCircle = function (cy,color, labelText){
-        var cx = indicatorCircleRadius + horizontalOffset;
+    var drawIndicatorRect = function(cy,color, labelText){
+        var cx =  horizontalOffset;
         context.moveTo(cx, cy);
         context.beginPath();
         context.fillStyle = color;
-        context.arc(cx, cy, indicatorCircleRadius, 0, 2*Math.PI, false);
+        context.rect(cx, cy, rectWidth, rectHeight);
+        //context.arc(cx, cy, indicatorCircleRadius, 0, 2*Math.PI, false);
         context.fill();
 
         context.textAlign = 'center';
         context.fillStyle = "black";
-        context.fillText(labelText, cx,cy);
+        context.fillText(labelText, cx+rectWidth/2,cy+ rectHeight/2);
     };
 
     var drawSmallerCircles = function(cx,cy, numOfCircles,fillColor){
@@ -252,24 +254,24 @@ var TempChart = (function () {
 
         /*Draw first vertical bar.*/
         var verticalBarHeight = canvas.height - 2*verticalOffset;
-        var cx = 2*(indicatorCircleRadius + horizontalOffset);
+        var cx = rectWidth + 2*horizontalOffset;
         var cy = verticalOffset;
         drawRect(cx, cy, verticalBarWidth, verticalBarHeight);
 
         /*draw horizontal bars as well as inner circles of the base grid.*/
         cx += verticalBarWidth;
-        cy += indicatorCircleRadius;
+        cy += rectHeight;
         var horizontalBarHeight = 1;
         var horizontalBarWidth = numberOfInnerCircles*2*radiusInnerCircle +
             (numberOfInnerCircles+1)*innerCircleOffset;
         for (var i=0; i<values.length; i++){
             drawRect(cx,cy,horizontalBarWidth,horizontalBarHeight );
-            drawIndicatorCircle(cy,values[i].color, values[i].label);
+            drawIndicatorRect(cy-rectHeight/2, values[i].color, values[i].label);
             drawSmallerCircles(cx+radiusInnerCircle+innerCircleOffset,
                                cy,
                                numberOfInnerCircles,
                                "#D0D0D0");
-            cy += (2*indicatorCircleRadius + verticalOffset);
+            cy += (2*rectHeight + verticalOffset);
         }
 
         /*Draw second vertical bar.*/
@@ -290,7 +292,7 @@ var TempChart = (function () {
     var highlightCircles = function(numOfCompleteCircles, fraction, cy, fillColor){
 
         /*start of cx is fixed for all inner circles.*/
-        var cx = 2*(indicatorCircleRadius + horizontalOffset) +
+        var cx = rectWidth + 2*horizontalOffset +
             verticalBarWidth +innerCircleOffset + radiusInnerCircle;
 
         /* highlight completed circles.*/
@@ -304,7 +306,7 @@ var TempChart = (function () {
 
     var drawPercent = function(values){
         var total = getTotalValues(values);
-        var cy = indicatorCircleRadius + verticalOffset;
+        var cy = rectHeight + verticalOffset;
         for(var i=0; i<values.length ; i++){
             var pct = values[i].value/total;
             var color = values[i].color;
@@ -315,7 +317,7 @@ var TempChart = (function () {
                           totalNumOfCircles+"\n\tnumOfCompleteCircles:"+numOfCompleteCircles+
                           "\n\tfractionOfCircle:"+fractionOfCircle);*/
             highlightCircles(numOfCompleteCircles, fractionOfCircle, cy, color);
-            cy += (2*indicatorCircleRadius + verticalOffset);
+            cy += (2*rectHeight + verticalOffset);
         }
 
     };
