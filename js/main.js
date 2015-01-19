@@ -40,7 +40,7 @@ var PieChart = (function () {
       //set default styles for canvas
       context.strokeStyle = "#333";	//colour of the lines
       context.lineWidth = 3;
-      context.font = "bold 16pt Arial";
+      context.font = "bold 12pt Arial";
       context.fillStyle = "#900";	//colour of the text
       context.textAlign = "left";
     };
@@ -66,7 +66,65 @@ var PieChart = (function () {
 
         //put the canvas back to the original position
         context.restore();
-    }
+    };
+
+    var wrapText = function(text, x , y, lineHeight){
+        var words = text.split(' ');
+        var line = '';
+        var maxWidth = 70;
+
+        for(var n = 0; n < words.length; n++) {
+          var testLine = line + words[n] + ' ';
+          var metrics = context.measureText(testLine);
+          var testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            context.fillText(line, x, y);
+            line = words[n] + ' ';
+            y += lineHeight;
+          }
+          else {
+            line = testLine;
+          }
+        }
+        context.fillText(line, x, y);
+    };
+
+    var addLabels = function(rotationAngle, cx, cy, textLabel){
+        context.save();
+        context.translate(cx, cy);
+
+        /* Rotate text to be parallel to lines of Pie-Chart.*/
+        if(rotationAngle < Math.PI/2){
+            context.rotate(rotationAngle);
+            cx = 4;
+            cy = 0;
+        }else if (rotationAngle < Math.PI){
+            context.rotate(Math.PI + rotationAngle);
+            cx = -70;
+            cy = 0;
+        }else if (rotationAngle < 3*Math.PI/2){
+            context.rotate(Math.PI + rotationAngle);
+            cx = -55;
+            cy = 0;
+        }else{
+            context.rotate(rotationAngle);
+            cx = 4;
+            cy = 0;
+        }
+
+        context.textAlign = 'left';
+
+        /* Wrap text if it exceeds current line width.*/
+        var textWidth = context.measureText(textLabel).width;
+        if (textWidth > 90){
+            var lineHeightInPixels = 14;
+            wrapText(textLabel, cx, cy, lineHeightInPixels);
+        }else{
+            context.fillText(textLabel, cx , cy);
+        }
+        context.restore();
+    };
+
     var draw = function (values) {
         canvas = document.getElementById("pie-chart");
         context = canvas.getContext("2d");
@@ -109,7 +167,10 @@ var PieChart = (function () {
             var dy = Math.sin(midAngle) * (radius + 30);
             context.lineTo(dx, dy);
             context.stroke();
-            context.fillText(values[i].label, dx , dy);
+
+            /* Write text parallet to mid line*/
+            addLabels(midAngle,dx,dy,values[i].label);
+
             //put the canvas back to the original position
             context.restore();
             //update the currentAngle
@@ -245,9 +306,9 @@ var TempChart = (function () {
             var totalNumOfCircles = pct * numberOfInnerCircles;
             var numOfCompleteCircles = Math.floor(totalNumOfCircles);
             var fractionOfCircle     = totalNumOfCircles - numOfCompleteCircles;
-            console.debug("value:"+values[i].value+"\n\tpct:"+pct+"\n\ttotalNumOfCircles:"+
+            /*console.debug("value:"+values[i].value+"\n\tpct:"+pct+"\n\ttotalNumOfCircles:"+
                           totalNumOfCircles+"\n\tnumOfCompleteCircles:"+numOfCompleteCircles+
-                          "\n\tfractionOfCircle:"+fractionOfCircle);
+                          "\n\tfractionOfCircle:"+fractionOfCircle);*/
             highlightCircles(numOfCompleteCircles, fractionOfCircle, cy, color);
             cy += (2*indicatorCircleRadius + offset);
         }
