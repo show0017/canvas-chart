@@ -29,6 +29,50 @@ function onLoadJson(data){
 }
 
 
+var dataSegments = (function () {
+    var dataArray = [];
+    var sum = 0;
+    var maxValue = -1;
+    var minValue;
+    var parseArray = function (values) {
+        minValue = values[0].value;
+        for(var i=0; i<values.length; i++){
+            dataArray [i]= values[i].value;
+            sum += dataArray[i];
+            if (dataArray[i]> maxValue){
+                maxValue = dataArray[i];
+            }
+            if (dataArray[i] < minValue){
+                minValue = dataArray[i];
+            }
+        }
+
+        console.debug("total = "+ sum);
+        console.debug("max = "+ maxValue);
+        console.debug("min = "+ minValue);
+    };
+
+    var getTotalValues =  function () {
+        return sum;
+    };
+
+    var getMaxIndex =  function () {
+        return dataArray.indexOf(maxValue);
+    };
+
+    var getMinIndex =  function () {
+        return dataArray.indexOf(minValue);
+    };
+
+    return {
+        parseArray : parseArray,
+        getTotalValues : getTotalValues,
+        getMaxIndex : getMaxIndex,
+        getMinIndex : getMinIndex
+    };
+
+})();
+
 /* Pie-Chart Functions*/
 var PieChart = (function () {
 
@@ -43,15 +87,6 @@ var PieChart = (function () {
       context.font = "bold 12pt Arial";
       context.fillStyle = "#900";	//colour of the text
       context.textAlign = "left";
-    };
-
-    var getTotalValues = function (values){
-        var sum = 0;
-        for(var i=0; i<values.length; i++){
-            sum += values[i].value;
-        }
-
-        return sum;
     };
 
     var drawInnerCircle = function(cx, cy){
@@ -134,11 +169,13 @@ var PieChart = (function () {
         canvas = document.getElementById("pie-chart");
         context = canvas.getContext("2d");
         setDefaultStyles();
+        dataSegments.parseArray(values);
 
         var cx = canvas.width/2;
         var cy = canvas.height/2;
         var currentAngle = 0;
-        var total = getTotalValues(values);
+        var total = dataSegments.getTotalValues();
+        var finalRadius;
 
         for(var i=0; i<values.length; i++){
             var pct = values[i].value/total;
@@ -149,7 +186,17 @@ var PieChart = (function () {
             context.moveTo(cx, cy);
             context.beginPath();
             context.fillStyle = colour;
-            context.arc(cx, cy, radius, currentAngle, endAngle, false);
+            switch(i){
+                    case dataSegments.getMaxIndex():
+                        finalRadius = 0.9 * radius;
+                        break;
+                    case dataSegments.getMinIndex():
+                        finalRadius = 1.1 * radius;
+                        break;
+                    default:
+                        finalRadius = radius;
+            }
+            context.arc(cx, cy, finalRadius, currentAngle, endAngle, false);
             context.lineTo(cx, cy);
             context.fill();
 
