@@ -114,6 +114,11 @@ var PieChart = (function () {
 
         context.textAlign = 'left';
 
+        context.shadowColor = "black";
+        context.shadowOffsetX = 3;
+        context.shadowOffsetY = 3;
+        context.shadowBlur = 7;
+
         /* Wrap text if it exceeds current line width.*/
         var textWidth = context.measureText(textLabel).width;
         if (textWidth > 90){
@@ -235,7 +240,7 @@ var TempChart = (function () {
         context.fill();
 
         context.textAlign = 'center';
-        context.fillStyle = "black";
+        context.fillStyle = ("rgb(18,82,178)"===color)?"white":"black";
         context.fillText(labelText, cx+rectWidth/2,cy+ rectHeight/2);
     };
 
